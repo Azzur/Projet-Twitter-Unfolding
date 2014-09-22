@@ -101,6 +101,10 @@ public class Program extends PApplet {
     }
 
     void addMarkers(ArrayList<Tweet> tweets) {
+
+        System.out.println(tweets.size() + " Tweets");
+        int i = 0;
+        int j = 0;
         for (Tweet status : tweets) {
 
             if (null != status.getGeo()) {
@@ -108,17 +112,19 @@ public class Program extends PApplet {
 
 
                 markers.add(new Location(geo.latitude, geo.longitude));
-
+                i++;
             } else if (null != status.getPlace()) {
 
                 TweetPlace tweetPlace = status.getPlace();
 
                 polygonMarkers.add(tweetPlace.getLocations());
-
+                j++;
 
             }
 
         }
+
+        System.out.println((i+j) + " Localized tweets ("+i +" points, "+j+" polygons)");
     }
 
     public void submitForm() {
@@ -131,14 +137,15 @@ public class Program extends PApplet {
         button.setOff();
 
         map.getDefaultMarkerManager().clearMarkers();
-
+        markers = new ArrayList<Location>();
+        polygonMarkers = new ArrayList<List<Location>>();
 
         try {
             ArrayList<Tweet> tweets = getTweetSearch(searchField);
             addMarkers(tweets);
 
             for (Location marker : markers)
-                map.addMarker(new TweetMarker(marker, loadImage("C:\\Users\\Rodolphe\\Downloads\\1411406170_678111-map-marker-48.png")));
+                map.addMarker(new TweetMarker(marker, loadImage("C:\\Users\\Rodolphe\\IdeaProjects\\cours\\com.insta.processing.1\\Projet-Twitter-Unfolding\\data\\img\\larry.png")));
             for (List<Location> polygonLocations : polygonMarkers)
                 map.addMarker(new SimplePolygonMarker(polygonLocations));
 

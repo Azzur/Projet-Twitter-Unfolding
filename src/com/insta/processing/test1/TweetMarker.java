@@ -28,7 +28,7 @@ public class TweetMarker extends AbstractMarker {
 
         pg.pushStyle();
         pg.imageMode(PConstants.CORNER);
-        pg.image(img, x - 16, y - img.height);
+        pg.image(img, x - img.width/2, y - img.height/2);
 //        if (isSelected()) pg.text(text, (float) (x - pg.textWidth(text) / 2), y + 4);
         pg.popStyle();
     }
