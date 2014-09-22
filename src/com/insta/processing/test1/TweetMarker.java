@@ -2,7 +2,6 @@ package com.insta.processing.test1;
 
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.AbstractMarker;
-import de.fhpotsdam.unfolding.marker.SimplePointMarker;
 import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -29,7 +28,7 @@ public class TweetMarker extends AbstractMarker {
 
         pg.pushStyle();
         pg.imageMode(PConstants.CORNER);
-        pg.image(img, x - 16, y - 24);
+        pg.image(img, x - 16, y - img.height);
 //        if (isSelected()) pg.text(text, (float) (x - pg.textWidth(text) / 2), y + 4);
         pg.popStyle();
     }

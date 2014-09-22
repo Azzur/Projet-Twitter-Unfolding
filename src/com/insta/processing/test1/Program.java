@@ -5,12 +5,14 @@ import de.fhpotsdam.unfolding.*;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.SimplePolygonMarker;
 import controlP5.*;
+import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.utils.*;
 import org.json.JSONException;
 import processing.core.*;
 import com.temboo.core.*;
 import com.temboo.Library.Twitter.Trends.*;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,23 +49,24 @@ public class Program extends PApplet {
         noFill();
         PFont font = createFont("arial",20);
 
-
         cp5 = new ControlP5(this);
 
         textfield = cp5.addTextfield("input")
                 .setFont(font)
                 .setPosition(15,15)
-                .setSize(160,40)
+                .setSize(185,40)
                 .setFocus(true)
                 .setColor(color(255,0,0))
                 .setText(searchField)
         ;
         button = cp5.addButton("submitForm")
-                .setStringValue("Find")
-                .setPosition(15,60)
-                .setSize(160,40);
+                .setPosition(15, 60)
+                .setSize(185, 40);
+        button = cp5.addButton("resetZoom")
+                .setPosition(15,545)
+                .setSize(185,40);
 
-        map = new UnfoldingMap(this , 210, 10, 780 , 580);
+        map = new UnfoldingMap(this , 210, 10, 780 , 580, new Google.GoogleTerrainProvider());
 
         MapUtils.createDefaultEventDispatcher(this, map);
         thread("updateMap");
@@ -144,6 +147,10 @@ public class Program extends PApplet {
         }
 
         button.setOn();
+    }
+
+    public void resetZoom() {
+        map.zoomLevelOut();
     }
 
 }
