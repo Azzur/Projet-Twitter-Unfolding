@@ -17,7 +17,7 @@ public class InstagramMedia implements Locatable {
 
     @Override
     public Marker getMarker(PApplet applet) {
-        return new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("C:\\Users\\Rodolphe\\IdeaProjects\\cours\\com.insta.processing.1\\Projet-Twitter-Unfolding\\data\\img\\instagram.png"));
+        return new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("https://cdn3.iconfinder.com/data/icons/follow-me/256/Instagram-32.png"));
     }
 
     @Override
