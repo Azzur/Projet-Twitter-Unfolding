@@ -1,8 +1,12 @@
 package com.insta.processing.test1;
 
+import de.fhpotsdam.unfolding.geo.Location;
+import de.fhpotsdam.unfolding.marker.Marker;
+import de.fhpotsdam.unfolding.marker.SimplePolygonMarker;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import processing.core.PApplet;
 
 import java.util.ArrayList;
 
@@ -12,7 +16,7 @@ import java.util.ArrayList;
  *         Created at : 22/09/2014
  *         Project : com.insta.processing.1
  */
-public class Tweet {
+public class Tweet implements Locatable {
 
     private int id;
     private String text;
@@ -47,10 +51,11 @@ public class Tweet {
 
             } else { status.setPlace(null); }
 
-            statuses.add(status);
+            if (location != null || place != null)
+                statuses.add(status);
 
         }
-
+        System.out.println(len + "founded, "+statuses.size()+" localized");
         return statuses;
     }
 
@@ -87,11 +92,29 @@ public class Tweet {
     }
 
     @Override
+    public void setGeo(double latitude, double longitude) {
+        this.geo = new Geo();
+        this.geo.latitude = latitude;
+        this.geo.longitude = longitude;
+    }
+
+    @Override
     public String toString() {
         return "Tweet{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
                 ", geo=" + geo +
                 '}';
+    }
+
+    @Override
+    public Marker getMarker(PApplet applet) {
+
+        if (this.geo != null)
+            return new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("C:\\Users\\Rodolphe\\IdeaProjects\\cours\\com.insta.processing.1\\Projet-Twitter-Unfolding\\data\\img\\twitter.png"));
+        else if (this.place != null)
+            return new SimplePolygonMarker(this.place.getLocations());
+
+        return null;
     }
 }

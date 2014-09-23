@@ -1,18 +1,19 @@
 package com.insta.processing.test1;
 
+import com.temboo.Library.Instagram.*;
 import com.temboo.Library.Twitter.Search.Tweets;
 import de.fhpotsdam.unfolding.*;
 import de.fhpotsdam.unfolding.geo.Location;
-import de.fhpotsdam.unfolding.marker.SimplePolygonMarker;
 import controlP5.*;
+import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.utils.*;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import processing.core.*;
 import com.temboo.core.*;
-import com.temboo.Library.Twitter.Trends.*;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +28,8 @@ public class Program extends PApplet {
     ControlP5 cp5;
     UnfoldingMap map;
     TembooSession session = new TembooSession("senorihl", "Processing", "ee23a86b447a45eba3c7f798bb1aa1b4");
-    List<Location> markers = new ArrayList<Location>();
-    List<List<Location>> polygonMarkers = new ArrayList<List<Location>>();
     Textfield textfield;
-    String searchField = "#temboo";
+    String searchField = "#subway";
     Button button;
 
     public void setup() {
@@ -71,7 +70,6 @@ public class Program extends PApplet {
         MapUtils.createDefaultEventDispatcher(this, map);
         thread("updateMap");
 
-
     }
 
     public void draw() {
@@ -86,6 +84,9 @@ public class Program extends PApplet {
     }
 
     ArrayList<Tweet> getTweetSearch(String search) throws JSONException {
+
+        System.out.println("Retrieving Tweets");
+
         Tweets tweetsChoreo = new Tweets(session);
         tweetsChoreo.setAccessToken("89814238-xX3Grmyv8jteVfPCkjM203OKAMfDWhXjPop3OUCp9");
         tweetsChoreo.setAccessTokenSecret("OSJ0anNnFfSMrIWlUREKjku8z0Un4PKfdl3O8gbIT5R1E");
@@ -100,31 +101,44 @@ public class Program extends PApplet {
 
     }
 
-    void addMarkers(ArrayList<Tweet> tweets) {
+    ArrayList<InstagramMedia> getInstagramMedias(String search) throws JSONException {
+        System.out.println("Retrieving Instragram Media");
+        ArrayList<InstagramMedia> medias = new ArrayList<InstagramMedia>();
+        SearchTags searchTags = new SearchTags(session);
+        searchTags.setAccessToken("53267369.1fb234f.9bfabe4bbfc746278a4db7f1c3cc3467");
+        searchTags.setQuery(search);
 
-        System.out.println(tweets.size() + " Tweets");
-        int i = 0;
-        int j = 0;
-        for (Tweet status : tweets) {
+        String result = searchTags.run().getResponse();
 
-            if (null != status.getGeo()) {
-                Geo geo = status.getGeo();
+        JSONObject jsonObject = new JSONObject(result);
+        JSONArray data = jsonObject.getJSONArray("data");
+        if (data.length() > 0) {
+            RecentlyTaggedMedia media = new RecentlyTaggedMedia(session);
+            media.setAccessToken(/*oAuth.run().getAccessToken()*/"53267369.1fb234f.9bfabe4bbfc746278a4db7f1c3cc3467");
+            media.setTagName(data.getJSONObject(0).getString("name"));
+            media.setClientID("15c2b97cc14d47768b9ab1052efeb016");
+            
 
-
-                markers.add(new Location(geo.latitude, geo.longitude));
-                i++;
-            } else if (null != status.getPlace()) {
-
-                TweetPlace tweetPlace = status.getPlace();
-
-                polygonMarkers.add(tweetPlace.getLocations());
-                j++;
+            result = media.run().getResponse();
+            jsonObject = new JSONObject(result);
+            data = jsonObject.getJSONArray("data");
+            if (data.length() > 0) {
+                for (int i = 0 ; i < data.length() ; i++) {
+                    JSONObject location = data.getJSONObject(i).getJSONObject("location");
+                    if (location  != null) {
+                        InstagramMedia instagramMedia = new InstagramMedia();
+                        System.out.println(location);
+                        instagramMedia.setGeo(location.getDouble("latitude"), location.getDouble("longitude"));
+                        medias.add(instagramMedia);
+                    }
+                }
 
             }
+            System.out.println(data.length() + "founded, "+medias.size()+" localized");
 
         }
 
-        System.out.println((i+j) + " Localized tweets ("+i +" points, "+j+" polygons)");
+        return medias;
     }
 
     public void submitForm() {
@@ -137,17 +151,18 @@ public class Program extends PApplet {
         button.setOff();
 
         map.getDefaultMarkerManager().clearMarkers();
-        markers = new ArrayList<Location>();
-        polygonMarkers = new ArrayList<List<Location>>();
 
         try {
-            ArrayList<Tweet> tweets = getTweetSearch(searchField);
-            addMarkers(tweets);
+            ArrayList<Locatable> localisations = new ArrayList<Locatable>();
+            localisations.addAll(getTweetSearch(searchField));
+            localisations.addAll(getInstagramMedias(searchField));
 
-            for (Location marker : markers)
-                map.addMarker(new TweetMarker(marker, loadImage("C:\\Users\\Rodolphe\\IdeaProjects\\cours\\com.insta.processing.1\\Projet-Twitter-Unfolding\\data\\img\\larry.png")));
-            for (List<Location> polygonLocations : polygonMarkers)
-                map.addMarker(new SimplePolygonMarker(polygonLocations));
+            for (Locatable localisation : localisations) {
+                Marker marker = localisation.getMarker(this);
+                if (marker != null) {
+                    map.addMarker(marker);
+                }
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();

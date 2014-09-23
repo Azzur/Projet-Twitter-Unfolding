@@ -12,12 +12,12 @@ import processing.core.PImage;
  *         Created at : 22/09/2014
  *         Project : com.insta.processing.1
  */
-public class TweetMarker extends AbstractMarker {
+public class PlaceMarker extends AbstractMarker {
 
     PImage img;
     String text;
 
-    public TweetMarker(Location location, PImage img) {
+    public PlaceMarker(Location location, PImage img) {
         super(location);
         this.img = img;
 //        this.text = text;
