@@ -18,7 +18,7 @@ import java.util.List;
 
 
 /**
- * @author Rodolphe
+ * @author Azzur
  *         <p/>
  *         Created at : 19/09/2014
  *         Project : com.insta.processing.1
@@ -145,7 +145,7 @@ public class Program extends PApplet {
             addMarkers(tweets);
 
             for (Location marker : markers)
-                map.addMarker(new TweetMarker(marker, loadImage("C:\\Users\\Rodolphe\\IdeaProjects\\cours\\com.insta.processing.1\\Projet-Twitter-Unfolding\\data\\img\\larry.png")));
+                map.addMarker(new TweetMarker(marker, loadImage("https://raw.githubusercontent.com/Azzur/Projet-Twitter-Unfolding/master/data/img/larry.png")));
             for (List<Location> polygonLocations : polygonMarkers)
                 map.addMarker(new SimplePolygonMarker(polygonLocations));
 

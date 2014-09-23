@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 /**
- * @author Rodolphe
+ * @author Azzur
  *         <p/>
  *         Created at : 22/09/2014
  *         Project : com.insta.processing.1

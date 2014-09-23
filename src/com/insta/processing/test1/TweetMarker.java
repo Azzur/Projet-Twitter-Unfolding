@@ -7,7 +7,7 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 
 /**
- * @author Rodolphe
+ * @author Azzur
  *         <p/>
  *         Created at : 22/09/2014
  *         Project : com.insta.processing.1
