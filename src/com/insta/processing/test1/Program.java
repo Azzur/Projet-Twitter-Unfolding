@@ -68,12 +68,13 @@ public class Program extends PApplet {
         map = new UnfoldingMap(this , 210, 10, 780 , 580, new Google.GoogleTerrainProvider());
 
         MapUtils.createDefaultEventDispatcher(this, map);
-        thread("updateMap");
+
+
+        updateMap();
 
     }
 
     public void draw() {
-
         map.draw();
     }
 
@@ -127,7 +128,6 @@ public class Program extends PApplet {
                     JSONObject location = data.getJSONObject(i).getJSONObject("location");
                     if (location  != null) {
                         InstagramMedia instagramMedia = new InstagramMedia();
-                        System.out.println(location);
                         instagramMedia.setGeo(location.getDouble("latitude"), location.getDouble("longitude"));
                         medias.add(instagramMedia);
                     }
