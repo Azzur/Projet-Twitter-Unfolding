@@ -121,8 +121,7 @@ public class Program extends PApplet {
         MapUtils.createDefaultEventDispatcher(this, currentMap);
 
         thread("initMap");
-        fill(255, 255, 255);
-        stroke(180);
+
 
     }
 
@@ -147,17 +146,19 @@ public class Program extends PApplet {
     }
 
     public void draw() {
+        currentMap.draw(); currentMap.setActive(false); textfield.setFocus(true);
 
         if (isSearching) {
             pushMatrix();
-            translate(displayWidth/2, displayHeight/2, 200);
+            fill(255, 255, 255);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
             rotateX(radians(frameCount));
             rotateY(radians(frameCount));
             box(50);
             popMatrix();
         }
 
-        currentMap.draw(); currentMap.setActive(false); textfield.setFocus(true);
     }
 
 
@@ -231,7 +232,7 @@ public class Program extends PApplet {
 
         textfield.setText("");
         textfield.setFocus(true);
-        updateMap();
+        thread("updateMap");
     }
 
     public void updateMap() {
