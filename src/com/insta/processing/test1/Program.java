@@ -7,6 +7,7 @@ import de.fhpotsdam.unfolding.*;
 import de.fhpotsdam.unfolding.geo.Location;
 import controlP5.*;
 import de.fhpotsdam.unfolding.marker.Marker;
+import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.Microsoft;
 import de.fhpotsdam.unfolding.providers.Yahoo;
@@ -35,13 +36,23 @@ public class Program extends PApplet {
     Textfield textfield;
     String searchField = "#subway";
     Button button,button2;
-    ArrayList<UnfoldingMap>maps = new ArrayList<UnfoldingMap>();
+    List<AbstractMapProvider> providers = new ArrayList<AbstractMapProvider>();
     PImage buttonimg,buttonimg2;
     List<Marker> markers = new ArrayList<Marker>();
+    private boolean isSearching = false;
 
+
+    public boolean sketchFullScreen() {
+        return true;
+    }
 
     public void setup() {
         size(displayWidth, displayHeight, OPENGL);
+        if (frame != null) {
+            frame.setResizable(false);
+        }
+
+        sketchFullScreen();
 
         smooth();
         background(0,0,0);
@@ -50,8 +61,6 @@ public class Program extends PApplet {
         stroke(0,0,0);
         rect(9,9, 202, displayWidth );
         popMatrix();
-        noStroke();
-        noFill();
         PFont font = createFont("arial",20);
 
         cp5 = new ControlP5(this);
@@ -67,7 +76,7 @@ public class Program extends PApplet {
                 .setText(searchField)
         ;
 
-        buttonimg2 = loadImage("C:\\Users\\Azzzur\\Desktop\\insta.png");
+        buttonimg2 = loadImage("https://cdn1.iconfinder.com/data/icons/plex-for-android/96/twitter.png");
         button2 = cp5.addButton("submitForm2")
                 .setPosition(40, 30)
                 .setImage(buttonimg2)
@@ -80,47 +89,75 @@ public class Program extends PApplet {
                 .setImage(buttonimg)
                 .setSize(173, 238);
 
-        button = cp5.addButton("resetZoom")
+        button = cp5.addButton("zoomOut")
                 .setPosition(15, 280)
                 .setSize(185, 40);
 
+        button = cp5.addButton("microsoftMap")
+                .setPosition(15, 330)
+                .setSize(185, 40);
 
-        maps.add(new UnfoldingMap(this , 210, 10, displayWidth, displayHeight, new Microsoft.AerialProvider()));
-        maps.add(new UnfoldingMap(this, 210, 10, displayWidth, displayHeight, new Google.GoogleMapProvider()));
-        maps.add(new UnfoldingMap(this,210, 10, displayWidth, displayHeight, new Yahoo.RoadProvider()));
-        map = new UnfoldingMap(this , 210, 10, displayWidth, displayHeight, new Microsoft.AerialProvider());
-        map1 = new UnfoldingMap(this,210, 10, displayWidth, displayHeight, new Google.GoogleMapProvider());
-        map2 = new UnfoldingMap(this,210, 10, displayWidth, displayHeight, new Yahoo.RoadProvider());
-        MapUtils.createDefaultEventDispatcher(this, map,map1, map2);
-        currentMap = map;
-        currentMap.setTweening(true);
-        updateMap();
+        button = cp5.addButton("googleMap")
+                .setPosition(15, 380)
+                .setSize(185, 40);
+
+        button = cp5.addButton("yahooMap")
+                .setPosition(15, 430)
+                .setSize(185, 40);
+
+
+
+
+        AbstractMapProvider msft = new Microsoft.AerialProvider();
+        AbstractMapProvider ggle = new Google.GoogleMapProvider();
+        AbstractMapProvider yhoo = new Yahoo.RoadProvider();
+
+        providers.add(msft);
+        providers.add(ggle);
+        providers.add(yhoo);
+
+        currentMap = new UnfoldingMap(this, 210, 10, displayWidth-220, displayHeight, ggle);
+
+        MapUtils.createDefaultEventDispatcher(this, currentMap);
+
+        thread("initMap");
+        fill(255, 255, 255);
+        stroke(180);
 
     }
 
-    public void keyPressed() {
-        if (key == '1') {
-            currentMap = map;
-            currentMap.setZoomRange(3, 20);
-            updateMap();
-        } else if (key == '2') {
-            currentMap = map1;
-            currentMap.setZoomRange(3, 20);
-            updateMap();
-        } else if (key == '3') {
-            currentMap = map2;
-            currentMap.setZoomRange(3, 20);
-            updateMap();
-        }
+    public void yahooMap() {
+        currentMap.mapDisplay.setProvider(providers.get(2));
+    }
 
+    public void googleMap() {
+        currentMap.mapDisplay.setProvider(providers.get(1));
+    }
+
+    public void microsoftMap() {
+        currentMap.mapDisplay.setProvider(providers.get(0));
+    }
+
+
+    public void initMap() {
+        currentMap.setTweening(true);
+        currentMap.setZoomRange(3, 15);
+        currentMap.zoomLevel(0);
+        updateMap();
     }
 
     public void draw() {
-        if(frameCount%120==0)
-        {
-            System.out.println(textfield.getInfo());
+
+        if (isSearching) {
+            pushMatrix();
+            translate(displayWidth/2, displayHeight/2, 200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
         }
-        currentMap.draw();
+
+        currentMap.draw(); currentMap.setActive(false); textfield.setFocus(true);
     }
 
 
@@ -185,21 +222,25 @@ public class Program extends PApplet {
     }
 
     public void submitForm() {
-        searchField = textfield.getText();
+        if (!searchField.equalsIgnoreCase(textfield.getText())) {
+            searchField = textfield.getText();
+            markers = new ArrayList<Marker>();
+        }
+
+        System.out.println("Search for \""+searchField+"\"");
+
+        textfield.setText("");
+        textfield.setFocus(true);
         updateMap();
     }
 
     public void updateMap() {
-
-        button.setOff();
-
+        isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
-        if(markers.size()>0)
+
+        if(markers.size() <= 0)
         {
-            currentMap.addMarkers(markers);
-        }
-        else
-        {
+
             try {
                 ArrayList<Locatable> localisations = new ArrayList<Locatable>();
                 localisations.addAll(getTweetSearch(searchField));
@@ -207,22 +248,18 @@ public class Program extends PApplet {
 
                 for (Locatable localisation : localisations) {
                     Marker marker = localisation.getMarker(this);
-                    if (marker != null) {
-                        currentMap.addMarker(marker);
-                    }
+                    markers.add(marker);
                 }
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
-
-
-        button.setOn();
+        isSearching = false;
+        currentMap.addMarkers(markers);
     }
 
-    public void resetZoom() {
+    public void zoomOut() {
         currentMap.zoomLevelOut();
     }
 

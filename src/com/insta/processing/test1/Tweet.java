@@ -25,6 +25,7 @@ public class Tweet implements Locatable {
 
 
     public static ArrayList<Tweet> parseJSON(String response) throws JSONException {
+        System.out.println("Retrieving Tweets");
         ArrayList<Tweet> statuses = new ArrayList<Tweet>();
         JSONArray tweets = (new JSONObject(response)).getJSONArray("statuses");
         int len = tweets.length();
