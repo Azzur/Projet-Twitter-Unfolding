@@ -127,7 +127,6 @@ public class Tweet implements Locatable {
             return marker;
         }
 
-
         return null;
     }
 

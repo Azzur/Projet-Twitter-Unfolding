@@ -4,6 +4,7 @@ import com.temboo.Library.Instagram.RecentlyTaggedMedia;
 import com.temboo.Library.Instagram.SearchTags;
 import com.temboo.Library.Twitter.Search.Tweets;
 import com.temboo.core.TembooSession;
+import com.thoughtworks.xstream.XStream;
 import controlP5.Button;
 import controlP5.ControlP5;
 import controlP5.Textfield;
@@ -20,9 +21,13 @@ import org.json.JSONObject;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
-
+import processing.data.XML;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 /**
@@ -55,13 +60,11 @@ public class Program extends PApplet {
         if (frame != null) {
             frame.setResizable(false);
         }
-
         sketchFullScreen();
-
         smooth();
         background(0,0,0);
         pushMatrix();
-        fill(204,204,204);
+        fill(0,0,0);
         stroke(0,0,0);
         rect(9,9, 202, displayWidth );
         popMatrix();
@@ -80,9 +83,9 @@ public class Program extends PApplet {
                 .setText(searchField)
         ;
 
-        buttonimg2 = loadImage("https://cdn1.iconfinder.com/data/icons/plex-for-android/96/twitter.png");
+        buttonimg2 = loadImage("http://s8.postimg.org/wlul1sf7l/insta.png");
         button2 = cp5.addButton("submitForm2")
-                .setPosition(40, 30)
+                .setPosition(50, 30)
                 .setImage(buttonimg2)
                 .setSize(173, 238);
 
@@ -109,8 +112,9 @@ public class Program extends PApplet {
                 .setPosition(15, 430)
                 .setSize(185, 40);
 
-
-
+        button = cp5.addButton("save")
+                .setPosition(15, 480)
+                .setSize(185, 40);
 
         AbstractMapProvider msft = new Microsoft.AerialProvider();
         AbstractMapProvider ggle = new Google.GoogleMapProvider();
@@ -123,24 +127,75 @@ public class Program extends PApplet {
         currentMap = new UnfoldingMap(this, 210, 10, displayWidth-420, displayHeight, ggle);
 
         MapUtils.createDefaultEventDispatcher(this, currentMap);
-
         thread("initMap");
+
+
 
 
     }
 
     public void yahooMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
         currentMap.mapDisplay.setProvider(providers.get(2));
     }
 
     public void googleMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
         currentMap.mapDisplay.setProvider(providers.get(1));
     }
 
     public void microsoftMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
         currentMap.mapDisplay.setProvider(providers.get(0));
+
     }
 
+    public void save(){
+
+        JFrame parentFrame = new JFrame();
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save");
+        int userSelection = fileChooser.showSaveDialog(parentFrame);
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            save(fileToSave.getAbsolutePath()+".png");
+        }
+    }
 
     public void initMap() {
         currentMap.setTweening(true);
@@ -172,7 +227,6 @@ public class Program extends PApplet {
         if (frameCount%256 == 0)
             sup256 = !sup256;
 
-
         if (isSearching) {
             lights();
 
@@ -199,6 +253,9 @@ public class Program extends PApplet {
             pushMatrix();
                 translate(displayWidth / 2, displayHeight / 2, 0);
                 system.draw();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
             popMatrix();
 
 
@@ -269,10 +326,7 @@ public class Program extends PApplet {
                         medias.add(instagramMedia);
                     }
                 }
-
             }
-            System.out.println(data.length() + "founded, "+medias.size()+" localized");
-
         }
 
         return medias;
@@ -286,12 +340,11 @@ public class Program extends PApplet {
 
         System.out.println("Search for \""+searchField+"\"");
 
-        textfield.setText("");
         textfield.setFocus(true);
         thread("updateMap");
     }
 
-    public void updateMap() {
+     public void updateMap() {
         isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
 
@@ -307,13 +360,25 @@ public class Program extends PApplet {
                     Marker marker = localisation.getMarker(this);
                     markers.add(marker);
                 }
+                XStream xstream = new XStream();
+                String content = "This is the content to write into file";
+                File file = new File("c:\\plouf\\paf.xml");
+                FileWriter fw = new FileWriter(file.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.write(xstream.toXML(localisations));
+                bw.close();
 
             } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         isSearching = false;
         currentMap.addMarkers(markers);
+
     }
 
     public void zoomOut() {
