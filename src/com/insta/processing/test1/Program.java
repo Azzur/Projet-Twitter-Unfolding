@@ -1,24 +1,26 @@
 package com.insta.processing.test1;
 
-import com.temboo.Library.Instagram.*;
+import com.temboo.Library.Instagram.RecentlyTaggedMedia;
+import com.temboo.Library.Instagram.SearchTags;
 import com.temboo.Library.Twitter.Search.Tweets;
+import com.temboo.core.TembooSession;
 import controlP5.Button;
-import de.fhpotsdam.unfolding.*;
-import de.fhpotsdam.unfolding.geo.Location;
-import controlP5.*;
+import controlP5.ControlP5;
+import controlP5.Textfield;
+import de.fhpotsdam.unfolding.UnfoldingMap;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.providers.AbstractMapProvider;
 import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.Microsoft;
 import de.fhpotsdam.unfolding.providers.Yahoo;
-import de.fhpotsdam.unfolding.utils.*;
+import de.fhpotsdam.unfolding.utils.MapUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import processing.core.*;
-import com.temboo.core.*;
+import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PImage;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,15 +33,17 @@ import java.util.List;
  */
 public class Program extends PApplet {
     ControlP5 cp5;
-    UnfoldingMap map,map1,map2,currentMap;
-    TembooSession session = new TembooSession("azzur", "TwitterApp", "66138148fcf54ef9a5e806ac600bd079");
+    UnfoldingMap currentMap;
+    TembooSession session = new TembooSession("senorihl", "Processing", "ee23a86b447a45eba3c7f798bb1aa1b4");
     Textfield textfield;
-    String searchField = "#subway";
+    String searchField = "i'm at";
     Button button,button2;
     List<AbstractMapProvider> providers = new ArrayList<AbstractMapProvider>();
     PImage buttonimg,buttonimg2;
     List<Marker> markers = new ArrayList<Marker>();
     private boolean isSearching = false;
+    boolean sup256 = false;
+    OrbitingSystem system = new OrbitingSystem(this);
 
 
     public boolean sketchFullScreen() {
@@ -47,7 +51,7 @@ public class Program extends PApplet {
     }
 
     public void setup() {
-        size(displayWidth, displayHeight, OPENGL);
+        size(displayWidth, displayHeight, P3D);
         if (frame != null) {
             frame.setResizable(false);
         }
@@ -116,7 +120,7 @@ public class Program extends PApplet {
         providers.add(ggle);
         providers.add(yhoo);
 
-        currentMap = new UnfoldingMap(this, 210, 10, displayWidth-220, displayHeight, ggle);
+        currentMap = new UnfoldingMap(this, 210, 10, displayWidth-420, displayHeight, ggle);
 
         MapUtils.createDefaultEventDispatcher(this, currentMap);
 
@@ -145,18 +149,62 @@ public class Program extends PApplet {
         updateMap();
     }
 
+    public void mouseMoved() {
+        Marker hitMarker = currentMap.getFirstHitMarker(mouseX, mouseY);
+        if (hitMarker != null) {
+            // Select current marker
+            hitMarker.setSelected(true);
+        } else {
+            // Deselect all other markers
+            for (Marker marker : currentMap.getMarkers()) {
+                marker.setSelected(false);
+            }
+        }
+    }
+
     public void draw() {
-        currentMap.draw(); currentMap.setActive(false); textfield.setFocus(true);
+
+        background(0);
+        currentMap.draw();
+        currentMap.setActive(false);
+        textfield.setFocus(true);
+
+        if (frameCount%256 == 0)
+            sup256 = !sup256;
+
 
         if (isSearching) {
+            lights();
+
             pushMatrix();
-            fill(255, 255, 255);
-            stroke(180);
-            translate(displayWidth / 2, displayHeight / 2,200);
-            rotateX(radians(frameCount));
-            rotateY(radians(frameCount));
-            box(50);
+                noFill();
+                stroke( 0 );
+                translate(displayWidth / 2, displayHeight / 2,400);
+                rotateX(radians(frameCount%360));
+                rotateY(radians(frameCount));
+                box(50);
             popMatrix();
+
+
+            pushMatrix();
+                stroke(0xff3f729b);
+                fill(64,153,255);
+                translate(displayWidth / 2, displayHeight / 2,400);
+                rotateX(-radians(frameCount%360));
+                rotateZ(-radians(frameCount));
+                box(40);
+            popMatrix();
+
+
+            pushMatrix();
+                translate(displayWidth / 2, displayHeight / 2, 0);
+                system.draw();
+            popMatrix();
+
+
+            noStroke();
+            noFill();
+            fill(255);
         }
 
     }
@@ -206,10 +254,18 @@ public class Program extends PApplet {
             data = jsonObject.getJSONArray("data");
             if (data.length() > 0) {
                 for (int i = 0 ; i < data.length() ; i++) {
-                    JSONObject location = data.getJSONObject(i).getJSONObject("location");
+                    JSONObject instagramJSON = data.getJSONObject(i);
+                    JSONObject location = instagramJSON.getJSONObject("location");
                     if (location  != null) {
+
+                        System.out.println(instagramJSON);
                         InstagramMedia instagramMedia = new InstagramMedia();
                         instagramMedia.setGeo(location.getDouble("latitude"), location.getDouble("longitude"));
+                        instagramMedia.setMediaInfos(
+                                (instagramJSON.getJSONObject("caption") != null ? instagramJSON.getJSONObject("caption").getString("text") : ""),
+                                instagramJSON.getJSONObject("images").getJSONObject("thumbnail").getString("url"),
+                                instagramJSON.getJSONObject("user").getString("username")
+                        );
                         medias.add(instagramMedia);
                     }
                 }

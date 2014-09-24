@@ -22,6 +22,8 @@ public class Tweet implements Locatable {
     private String text;
     private Geo geo;
     private TweetPlace place;
+    private String mediaUrl;
+    private String author;
 
 
     public static ArrayList<Tweet> parseJSON(String response) throws JSONException {
@@ -38,6 +40,7 @@ public class Tweet implements Locatable {
             JSONObject location = statusJSON.getJSONObject("geo");
 
             if (null != location) {
+                System.out.println(statusJSON);
                 Geo geo = new Geo();
                 geo.latitude = location.getJSONArray("coordinates").getDouble(0);
                 geo.longitude = location.getJSONArray("coordinates").getDouble(1);
@@ -52,8 +55,14 @@ public class Tweet implements Locatable {
 
             } else { status.setPlace(null); }
 
-            if (location != null || place != null)
+            if (location != null || place != null) {
+                status.setMediaInfos(
+                        statusJSON.getString("text"),
+                        "",
+                        statusJSON.getJSONObject("user").getString("screen_name")
+                );
                 statuses.add(status);
+            }
 
         }
         System.out.println(len + "founded, "+statuses.size()+" localized");
@@ -111,11 +120,21 @@ public class Tweet implements Locatable {
     @Override
     public Marker getMarker(PApplet applet) {
 
-        if (this.geo != null)
-            return new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("https://cdn3.iconfinder.com/data/icons/follow-me/256/Twitter-32.png"));
-        else if (this.place != null)
-            return new SimplePolygonMarker(this.place.getLocations());
+        if (this.geo != null) {
+            PlaceMarker marker = new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("https://cdn3.iconfinder.com/data/icons/follow-me/256/Twitter-32.png"));
+            marker.setMediaInfos(text, applet.loadImage(mediaUrl), author);
+            marker.setEngine(applet);
+            return marker;
+        }
+
 
         return null;
+    }
+
+    public void setMediaInfos(String text, String mediaUrl, String author) {
+        this.text = text;
+        this.mediaUrl = mediaUrl;
+        this.author = author;
+
     }
 }
