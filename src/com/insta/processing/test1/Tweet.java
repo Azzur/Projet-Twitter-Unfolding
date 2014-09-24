@@ -113,8 +113,6 @@ public class Tweet implements Locatable {
 
         if (this.geo != null)
             return new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("https://cdn3.iconfinder.com/data/icons/follow-me/256/Twitter-32.png"));
-        else if (this.place != null)
-            return new SimplePolygonMarker(this.place.getLocations());
 
         return null;
     }
