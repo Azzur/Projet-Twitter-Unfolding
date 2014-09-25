@@ -1,5 +1,7 @@
 package com.insta.processing.test1;
 
+import com.temboo.Library.Twitter.Search.Tweets;
+import com.temboo.core.TembooSession;
 import de.fhpotsdam.unfolding.geo.Location;
 import de.fhpotsdam.unfolding.marker.Marker;
 import de.fhpotsdam.unfolding.marker.SimplePolygonMarker;
@@ -134,6 +136,21 @@ public class Tweet implements Locatable {
         this.text = text;
         this.mediaUrl = mediaUrl;
         this.author = author;
+
+    }
+
+    public static ArrayList<Tweet> getTweetSearch(String search, TembooSession session) throws JSONException {
+        Tweets tweetsChoreo = new Tweets(session);
+        tweetsChoreo.setAccessToken("2775368387-j63m9FFKfDGMH7FSqVYTglvN7ZcJdsuxe1MpwSz");
+        tweetsChoreo.setAccessTokenSecret("JfFDFqaJsa2CNNVY1my20TkGaDSzxmT695p3vnGv2Pdzz");
+        tweetsChoreo.setConsumerSecret("l1EvbO2LYN5FCWrMoFxT1bI7GkbteYlBBqsebrYbDiEEBVzHZ3");
+        tweetsChoreo.setConsumerKey("6m1HphSLGe99BnixQGCPmG4W0");
+        tweetsChoreo.setQuery(search);
+        tweetsChoreo.setCount(200);
+
+        String result = tweetsChoreo.run().getResponse();
+
+        return Tweet.parseJSON(result);
 
     }
 }

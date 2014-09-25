@@ -1,10 +1,7 @@
 package com.insta.processing.test1;
 
-import com.temboo.Library.Instagram.RecentlyTaggedMedia;
-import com.temboo.Library.Instagram.SearchTags;
-import com.temboo.Library.Twitter.Search.Tweets;
 import com.temboo.core.TembooSession;
-import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.*;
 import controlP5.Button;
 import controlP5.ControlP5;
 import controlP5.Textfield;
@@ -15,39 +12,75 @@ import de.fhpotsdam.unfolding.providers.Google;
 import de.fhpotsdam.unfolding.providers.Microsoft;
 import de.fhpotsdam.unfolding.providers.Yahoo;
 import de.fhpotsdam.unfolding.utils.MapUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
-import processing.data.XML;
+
 import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 
-
 /**
- * @author Azzur
- *         <p/>
+ * The type Program.
+ * @author Azzur          <p/>
  *         Created at : 19/09/2014
  *         Project : com.insta.processing.1
  */
 public class Program extends PApplet {
+
+    /**
+     * The Cp 5.
+     */
     ControlP5 cp5;
+    /**
+     * The Current map.
+     */
     UnfoldingMap currentMap;
+    /**
+     * The Session.
+     */
     TembooSession session = new TembooSession("senorihl", "Processing", "ee23a86b447a45eba3c7f798bb1aa1b4");
+    /**
+     * The Textfield.
+     */
     Textfield textfield;
+    /**
+     * The Search field.
+     */
     String searchField = "i'm at";
-    Button button,button2;
+    /**
+     * The Button.
+     */
+    Button button, /**
+     * The Button 2.
+     */
+    button2;
+    /**
+     * The Providers.
+     */
     List<AbstractMapProvider> providers = new ArrayList<AbstractMapProvider>();
-    PImage buttonimg,buttonimg2;
+    /**
+     * The Buttonimg.
+     */
+    PImage buttonimg, /**
+     * The Buttonimg 2.
+     */
+    buttonimg2;
+    /**
+     * The Markers.
+     */
     List<Marker> markers = new ArrayList<Marker>();
     private boolean isSearching = false;
+    /**
+     * The Sup 256.
+     */
     boolean sup256 = false;
+    /**
+     * The System.
+     */
     OrbitingSystem system = new OrbitingSystem(this);
 
 
@@ -134,89 +167,6 @@ public class Program extends PApplet {
 
     }
 
-    public void yahooMap() {
-        if (isSearching) {
-            pushMatrix();
-            fill(0, 51, 154);
-            textSize(18);
-            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
-            stroke(180);
-            translate(displayWidth / 2, displayHeight / 2,200);
-            rotateX(radians(frameCount));
-            rotateY(radians(frameCount));
-            box(50);
-            popMatrix();
-        }
-        currentMap.mapDisplay.setProvider(providers.get(2));
-    }
-
-    public void googleMap() {
-        if (isSearching) {
-            pushMatrix();
-            fill(0, 51, 154);
-            textSize(18);
-            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
-            stroke(180);
-            translate(displayWidth / 2, displayHeight / 2,200);
-            rotateX(radians(frameCount));
-            rotateY(radians(frameCount));
-            box(50);
-            popMatrix();
-        }
-        currentMap.mapDisplay.setProvider(providers.get(1));
-    }
-
-    public void microsoftMap() {
-        if (isSearching) {
-            pushMatrix();
-            fill(0, 51, 154);
-            textSize(18);
-            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
-            stroke(180);
-            translate(displayWidth / 2, displayHeight / 2,200);
-            rotateX(radians(frameCount));
-            rotateY(radians(frameCount));
-            box(50);
-            popMatrix();
-        }
-        currentMap.mapDisplay.setProvider(providers.get(0));
-
-    }
-
-    public void save(){
-
-        JFrame parentFrame = new JFrame();
-
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Specify a file to save");
-        int userSelection = fileChooser.showSaveDialog(parentFrame);
-
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            File fileToSave = fileChooser.getSelectedFile();
-            save(fileToSave.getAbsolutePath()+".png");
-        }
-    }
-
-    public void initMap() {
-        currentMap.setTweening(true);
-        currentMap.setZoomRange(3, 15);
-        currentMap.zoomLevel(0);
-        updateMap();
-    }
-
-    public void mouseMoved() {
-        Marker hitMarker = currentMap.getFirstHitMarker(mouseX, mouseY);
-        if (hitMarker != null) {
-            // Select current marker
-            hitMarker.setSelected(true);
-        } else {
-            // Deselect all other markers
-            for (Marker marker : currentMap.getMarkers()) {
-                marker.setSelected(false);
-            }
-        }
-    }
-
     public void draw() {
 
         background(0);
@@ -266,85 +216,37 @@ public class Program extends PApplet {
 
     }
 
-
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         PApplet.main(
                 "com.insta.processing.test1.Program"
         );
     }
 
-    ArrayList<Tweet> getTweetSearch(String search) throws JSONException {
-        Tweets tweetsChoreo = new Tweets(session);
-        tweetsChoreo.setAccessToken("2775368387-j63m9FFKfDGMH7FSqVYTglvN7ZcJdsuxe1MpwSz");
-        tweetsChoreo.setAccessTokenSecret("JfFDFqaJsa2CNNVY1my20TkGaDSzxmT695p3vnGv2Pdzz");
-        tweetsChoreo.setConsumerSecret("l1EvbO2LYN5FCWrMoFxT1bI7GkbteYlBBqsebrYbDiEEBVzHZ3");
-        tweetsChoreo.setConsumerKey("6m1HphSLGe99BnixQGCPmG4W0");
-        tweetsChoreo.setQuery(search);
-        tweetsChoreo.setCount(200);
+    /** Events handler */
 
-        String result = tweetsChoreo.run().getResponse();
+    public void save(){
 
-        return Tweet.parseJSON(result);
+        JFrame parentFrame = new JFrame();
 
-    }
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Specify a file to save");
+        int userSelection = fileChooser.showSaveDialog(parentFrame);
 
-    ArrayList<InstagramMedia> getInstagramMedias(String search) throws JSONException {
-        System.out.println("Retrieving Instragram Media");
-        ArrayList<InstagramMedia> medias = new ArrayList<InstagramMedia>();
-        SearchTags searchTags = new SearchTags(session);
-        searchTags.setAccessToken("53267369.1fb234f.9bfabe4bbfc746278a4db7f1c3cc3467");
-        searchTags.setQuery(search);
-
-        String result = searchTags.run().getResponse();
-
-        JSONObject jsonObject = new JSONObject(result);
-        JSONArray data = jsonObject.getJSONArray("data");
-        if (data.length() > 0) {
-            RecentlyTaggedMedia media = new RecentlyTaggedMedia(session);
-            media.setAccessToken(/*oAuth.run().getAccessToken()*/"53267369.1fb234f.9bfabe4bbfc746278a4db7f1c3cc3467");
-            media.setTagName(data.getJSONObject(0).getString("name"));
-            media.setClientID("15c2b97cc14d47768b9ab1052efeb016");
-            
-
-            result = media.run().getResponse();
-            jsonObject = new JSONObject(result);
-            data = jsonObject.getJSONArray("data");
-            if (data.length() > 0) {
-                for (int i = 0 ; i < data.length() ; i++) {
-                    JSONObject instagramJSON = data.getJSONObject(i);
-                    JSONObject location = instagramJSON.getJSONObject("location");
-                    if (location  != null) {
-
-                        System.out.println(instagramJSON);
-                        InstagramMedia instagramMedia = new InstagramMedia();
-                        instagramMedia.setGeo(location.getDouble("latitude"), location.getDouble("longitude"));
-                        instagramMedia.setMediaInfos(
-                                (instagramJSON.getJSONObject("caption") != null ? instagramJSON.getJSONObject("caption").getString("text") : ""),
-                                instagramJSON.getJSONObject("images").getJSONObject("thumbnail").getString("url"),
-                                instagramJSON.getJSONObject("user").getString("username")
-                        );
-                        medias.add(instagramMedia);
-                    }
-                }
-            }
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            save(fileToSave.getAbsolutePath()+".png");
         }
-
-        return medias;
     }
 
-    public void submitForm() {
-        if (!searchField.equalsIgnoreCase(textfield.getText())) {
-            searchField = textfield.getText();
-            markers = new ArrayList<Marker>();
-        }
-
-        System.out.println("Search for \""+searchField+"\"");
-
-        textfield.setFocus(true);
-        thread("updateMap");
-    }
-
-     public void updateMap() {
+    /**
+     * Update map.
+     */
+    public void updateMap() {
         isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
 
@@ -353,8 +255,8 @@ public class Program extends PApplet {
 
             try {
                 ArrayList<Locatable> localisations = new ArrayList<Locatable>();
-                localisations.addAll(getTweetSearch(searchField));
-                localisations.addAll(getInstagramMedias(searchField));
+                localisations.addAll(Tweet.getTweetSearch(searchField, session));
+                localisations.addAll(InstagramMedia.getInstagramMedias(searchField, session));
 
                 for (Locatable localisation : localisations) {
                     Marker marker = localisation.getMarker(this);
@@ -381,8 +283,106 @@ public class Program extends PApplet {
 
     }
 
+    public void mouseMoved() {
+        Marker hitMarker = currentMap.getFirstHitMarker(mouseX, mouseY);
+        if (hitMarker != null) {
+            // Select current marker
+            hitMarker.setSelected(true);
+        } else {
+            // Deselect all other markers
+            for (Marker marker : currentMap.getMarkers()) {
+                marker.setSelected(false);
+            }
+        }
+    }
+
+    /**
+     * Init map.
+     */
+    public void initMap() {
+        currentMap.setTweening(true);
+        currentMap.setZoomRange(3, 15);
+        currentMap.zoomLevel(0);
+        updateMap();
+    }
+
+    /** Button Callbacks */
+
     public void zoomOut() {
         currentMap.zoomLevelOut();
+    }
+
+    /**
+     * Yahoo map.
+     */
+    public void yahooMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
+        currentMap.mapDisplay.setProvider(providers.get(2));
+    }
+
+    /**
+     * Google map.
+     */
+    public void googleMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
+        currentMap.mapDisplay.setProvider(providers.get(1));
+    }
+
+    /**
+     * Microsoft map.
+     */
+    public void microsoftMap() {
+        if (isSearching) {
+            pushMatrix();
+            fill(0, 51, 154);
+            textSize(18);
+            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            stroke(180);
+            translate(displayWidth / 2, displayHeight / 2,200);
+            rotateX(radians(frameCount));
+            rotateY(radians(frameCount));
+            box(50);
+            popMatrix();
+        }
+        currentMap.mapDisplay.setProvider(providers.get(0));
+
+    }
+
+    /**
+     * Submit form.
+     */
+    public void submitForm() {
+        if (!searchField.equalsIgnoreCase(textfield.getText())) {
+            searchField = textfield.getText();
+            markers = new ArrayList<Marker>();
+        }
+
+        System.out.println("Search for \""+searchField+"\"");
+
+        textfield.setFocus(true);
+        thread("updateMap");
     }
 
 }
