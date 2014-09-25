@@ -42,7 +42,7 @@ public class Program extends PApplet {
     /**
      * The Session.
      */
-    TembooSession session = new TembooSession("senorihl", "Processing", "ee23a86b447a45eba3c7f798bb1aa1b4");
+    TembooSession session = new TembooSession("azzzzur", "TwitterApp", "f1912a4b69b04e9c84c7b153bf089873");
     /**
      * The Textfield.
      */
@@ -168,7 +168,7 @@ public class Program extends PApplet {
         providers.add(ggle);
         providers.add(yhoo);
 
-        currentMap = new UnfoldingMap(this, 210, 10, displayWidth-420, displayHeight, ggle);
+        currentMap = new UnfoldingMap(this, 210, 10, displayWidth-210, displayHeight-170, ggle);
 
         MapUtils.createDefaultEventDispatcher(this, currentMap);
         thread("initMap");

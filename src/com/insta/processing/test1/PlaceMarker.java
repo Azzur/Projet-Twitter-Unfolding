@@ -44,24 +44,28 @@ public class PlaceMarker extends AbstractMarker {
             engine.fill(255);
             engine.stroke(0);
 
-            float largeur = 200;
+            float largeur = 160;
 
 
-            engine.rect(engine.displayWidth-largeur, 0, largeur, engine.displayHeight);
+            engine.rect(210, engine.displayHeight-largeur,engine.displayWidth-200,largeur);
 
             if (mediaUrl != null) {
-                engine.image(mediaUrl, engine.displayWidth-largeur , (engine.displayHeight / 2) - mediaUrl.height);
+                engine.image(mediaUrl,220,engine.displayHeight-largeur,150,150);
             }
 
+            /*
             text = text.replaceAll("[^\\x00\\x08\\x0B\\x0C\\x0E-\\x1F]*", "?");
+             */
+
 
             engine.fill(0);
             try {
-                engine.text(text, engine.displayWidth-largeur +10,  engine.displayHeight/2 , largeur-20 , 40);
-                engine.text(author, engine.displayWidth-largeur+10,  (engine.displayHeight / 2) + 40, largeur-20, 40);
+                engine.text(text, 200+160, engine.displayHeight-largeur+50);
+                engine.text(author, 200+160,engine.displayHeight-largeur+5,engine.displayWidth-200-160-10,40 );
 
             } catch (Exception e) {
-                System.out.println( e.getClass().getName()+" : " + e.getMessage() +"\r\n\ttext : "+text+"\r\n\tauthor : "+author);
+                System.out.println( e.getClass().getName()+" : " + e.getMessage()+"" +"\r\n\ttext : "+text+"\r\n\tauthor : "+author);
+                System.out.println(e.getMessage());
                 e.printStackTrace();
             }
         }
