@@ -45,6 +45,7 @@ public class Program extends PApplet {
     PImage buttonimg,buttonimg2;
     List<Marker> markers = new ArrayList<Marker>();
     private boolean isSearching = false;
+    ArrayList<Locatable> localisations = new ArrayList<Locatable>();
 
 
     public boolean sketchFullScreen() {
@@ -108,8 +109,12 @@ public class Program extends PApplet {
                 .setPosition(15, 430)
                 .setSize(185, 40);
 
-        button = cp5.addButton("save")
+        button = cp5.addButton("pngsaver")
                 .setPosition(15, 480)
+                .setSize(185, 40);
+
+        button = cp5.addButton("xmlsaver")
+                .setPosition(15, 530)
                 .setSize(185, 40);
 
         AbstractMapProvider msft = new Microsoft.AerialProvider();
@@ -119,16 +124,10 @@ public class Program extends PApplet {
         providers.add(msft);
         providers.add(ggle);
         providers.add(yhoo);
-
-
         currentMap = new UnfoldingMap(this, 210, 10, displayWidth-220, displayHeight, ggle);
 
         MapUtils.createDefaultEventDispatcher(this, currentMap);
         thread("initMap");
-
-
-
-
     }
 
     public void yahooMap() {
@@ -180,18 +179,37 @@ public class Program extends PApplet {
 
     }
 
-    public void save(){
-
+    /*
+    Save PNG
+     */
+    public void pngsaver(){
         JFrame parentFrame = new JFrame();
-
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Specify a file to save");
         int userSelection = fileChooser.showSaveDialog(parentFrame);
-
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             save(fileToSave.getAbsolutePath()+".png");
         }
+    }
+
+    /*
+    Save XML
+     */
+    public void xmlsaver() throws IOException {
+
+        XStream xstream = new XStream();
+        JFrame parentFrame = new JFrame();
+        JFileChooser fileChooser = new JFileChooser();
+        int userSelection = fileChooser.showSaveDialog(parentFrame);
+        if (userSelection == JFileChooser.APPROVE_OPTION)
+        {
+            File fileToSave = fileChooser.getSelectedFile();
+            FileWriter fw = new FileWriter(fileToSave.getAbsoluteFile()+".xml");
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(xstream.toXML(localisations));
+            bw.close();
+        }
+
     }
 
     public void initMap() {
@@ -299,28 +317,16 @@ public class Program extends PApplet {
         {
 
             try {
-                ArrayList<Locatable> localisations = new ArrayList<Locatable>();
+                localisations.clear();
                 localisations.addAll(getTweetSearch(searchField));
                 localisations.addAll(getInstagramMedias(searchField));
-
                 for (Locatable localisation : localisations) {
                     Marker marker = localisation.getMarker(this);
                     markers.add(marker);
                 }
-                XStream xstream = new XStream();
-                String content = "This is the content to write into file";
-                File file = new File("c:\\plouf\\paf.xml");
-                FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                BufferedWriter bw = new BufferedWriter(fw);
-                bw.write(xstream.toXML(localisations));
-                bw.close();
-
             } catch (JSONException e) {
                 e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+
             }
         }
         isSearching = false;
@@ -333,3 +339,4 @@ public class Program extends PApplet {
     }
 
 }
+
