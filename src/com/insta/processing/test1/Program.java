@@ -130,6 +130,12 @@ public class Program extends PApplet {
                 .setImage(buttonimg)
                 .setSize(173, 238);
 
+        buttonimg = loadImage("https://cdn1.iconfinder.com/data/icons/windows-8-metro-style/64/google_web_search.png");
+        button = cp5.addButton("submitForm")
+                .setPosition(70, 200)
+                .setImage(buttonimg)
+                .setSize(173, 238);
+
         button = cp5.addButton("zoomOut")
                 .setPosition(15, 280)
                 .setSize(185, 40);
@@ -206,7 +212,7 @@ public class Program extends PApplet {
                 system.draw();
             fill(0, 51, 154);
             textSize(18);
-            text("Loading ...",displayWidth / 2-30, displayHeight / 2+100);
+            text("Loading ...",(displayWidth - textWidth("Loading ...")) / 2, displayHeight / 2+100, 400);
             popMatrix();
 
 
@@ -248,7 +254,7 @@ public class Program extends PApplet {
      * Update map.
      */
 
-    
+
     public void updateMap() {
         isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
@@ -257,7 +263,7 @@ public class Program extends PApplet {
         {
 
             try {
-                ArrayList<Locatable> localisations = new ArrayList<Locatable>();
+                localisations.clear();
                 localisations.addAll(Tweet.getTweetSearch(searchField, session));
                 localisations.addAll(InstagramMedia.getInstagramMedias(searchField, session));
 
@@ -265,19 +271,9 @@ public class Program extends PApplet {
                     Marker marker = localisation.getMarker(this);
                     markers.add(marker);
                 }
-                XStream xstream = new XStream();
-                String content = "This is the content to write into file";
-                File file = new File("c:\\plouf\\paf.xml");
-                FileWriter fw = new FileWriter(file.getAbsoluteFile());
-                BufferedWriter bw = new BufferedWriter(fw);
-                bw.write(xstream.toXML(localisations));
-                bw.close();
+
 
             } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
