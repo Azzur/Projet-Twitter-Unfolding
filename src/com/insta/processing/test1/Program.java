@@ -20,6 +20,7 @@ import processing.core.PImage;
 import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -42,7 +43,7 @@ public class Program extends PApplet {
     /**
      * The Session.
      */
-    TembooSession session = new TembooSession("senorihl", "Processing", "ee23a86b447a45eba3c7f798bb1aa1b4");
+    TembooSession session = new TembooSession("azzzur", "TwitterApp", "72183fea900042a4aa45bfdb58a8e1d1");
     /**
      * The Textfield.
      */
@@ -83,6 +84,7 @@ public class Program extends PApplet {
      */
     OrbitingSystem system = new OrbitingSystem(this);
     ArrayList<Locatable> localisations = new ArrayList<Locatable>();
+    private boolean stop;
 
 
     public boolean sketchFullScreen() {
@@ -124,17 +126,23 @@ public class Program extends PApplet {
                 .setSize(173, 238);
 
 
-        buttonimg = loadImage("https://cdn1.iconfinder.com/data/icons/windows-8-metro-style/64/google_web_search.png");
-        button = cp5.addButton("submitForm")
-                .setPosition(70, 200)
+        buttonimg = loadImage("http://png-1.findicons.com/files/icons/2152/snowish/64/gtk_media_play_ltr.png");
+        button = cp5.addButton("play")
+                .setPosition(80, 210)
                 .setImage(buttonimg)
-                .setSize(173, 238);
+                .setSize(64,64 );
+
+        buttonimg = loadImage("http://png-4.findicons.com/files/icons/2152/snowish/64/gtk_media_stop.png");
+        button = cp5.addButton("stop")
+                .setPosition(150, 210)
+                .setImage(buttonimg)
+                .setSize(64,64 );
 
         buttonimg = loadImage("https://cdn1.iconfinder.com/data/icons/windows-8-metro-style/64/google_web_search.png");
         button = cp5.addButton("submitForm")
-                .setPosition(70, 200)
+                .setPosition(10, 210)
                 .setImage(buttonimg)
-                .setSize(173, 238);
+                .setSize(64, 64);
 
         button = cp5.addButton("zoomOut")
                 .setPosition(15, 280)
@@ -178,7 +186,6 @@ public class Program extends PApplet {
 
         background(0);
         currentMap.draw();
-        currentMap.setActive(false);
         textfield.setFocus(true);
 
         if (frameCount%256 == 0)
@@ -253,8 +260,6 @@ public class Program extends PApplet {
     /**
      * Update map.
      */
-
-
     public void updateMap() {
         isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
@@ -265,7 +270,9 @@ public class Program extends PApplet {
             try {
                 localisations.clear();
                 localisations.addAll(Tweet.getTweetSearch(searchField, session));
-                localisations.addAll(InstagramMedia.getInstagramMedias(searchField, session));
+                String tag = InstagramMedia.getTag(searchField, session);
+                if (!tag.equals(""))
+                    localisations.addAll(InstagramMedia.getInstagramMedias(tag, session));
 
                 for (Locatable localisation : localisations) {
                     Marker marker = localisation.getMarker(this);
@@ -403,6 +410,50 @@ public class Program extends PApplet {
 
         textfield.setFocus(true);
         thread("updateMap");
+    }
+
+    public void play() {
+        if (!searchField.equalsIgnoreCase(textfield.getText())) {
+            searchField = textfield.getText();
+            markers = new ArrayList<Marker>();
+        }
+
+        System.out.println("play for \""+searchField+"\"");
+        stop = false;
+        currentMap.getDefaultMarkerManager().clearMarkers();
+        thread("continuousUpdate");
+    }
+
+    public void stop() {
+        stop = true;
+    }
+
+    public void continuousUpdate() throws InterruptedException {
+
+        markers.clear();
+
+        String tag = InstagramMedia.getTag(searchField, session);
+
+        do {
+            try {
+                localisations.clear();
+                localisations.addAll(Tweet.getTweetSearch(searchField, session));
+                if (!tag.equals(""))
+                    localisations.addAll(InstagramMedia.getInstagramMedias(tag, session));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            for (Locatable localisation : localisations) {
+                Marker marker = localisation.getMarker(this);
+                markers.add(marker);
+            }
+
+            currentMap.getDefaultMarkerManager().addMarkers(markers);
+
+
+        } while (!stop);
+
     }
 
 }

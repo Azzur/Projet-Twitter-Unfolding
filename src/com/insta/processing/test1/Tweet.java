@@ -42,7 +42,6 @@ public class Tweet implements Locatable {
             JSONObject location = statusJSON.getJSONObject("geo");
 
             if (null != location) {
-                System.out.println(statusJSON);
                 Geo geo = new Geo();
                 geo.latitude = location.getJSONArray("coordinates").getDouble(0);
                 geo.longitude = location.getJSONArray("coordinates").getDouble(1);
@@ -67,7 +66,7 @@ public class Tweet implements Locatable {
             }
 
         }
-        System.out.println(len + "founded, "+statuses.size()+" localized");
+        System.out.println(len + " founded, "+statuses.size()+" localized");
         return statuses;
     }
 
@@ -124,7 +123,7 @@ public class Tweet implements Locatable {
 
         if (this.geo != null) {
             PlaceMarker marker = new PlaceMarker(new Location(geo.latitude, geo.longitude), applet.loadImage("https://cdn3.iconfinder.com/data/icons/follow-me/256/Twitter-32.png"));
-            marker.setMediaInfos(text, applet.loadImage(mediaUrl), author);
+            marker.setMediaInfos(text, null, author);
             marker.setEngine(applet);
             return marker;
         }

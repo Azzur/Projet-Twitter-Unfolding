@@ -7,6 +7,8 @@ import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
+import java.util.HashMap;
+
 /**
  * @author Azzur
  *         <p/>
