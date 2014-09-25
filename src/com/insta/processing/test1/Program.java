@@ -82,6 +82,7 @@ public class Program extends PApplet {
      * The System.
      */
     OrbitingSystem system = new OrbitingSystem(this);
+    ArrayList<Locatable> localisations = new ArrayList<Locatable>();
 
 
     public boolean sketchFullScreen() {
@@ -145,8 +146,12 @@ public class Program extends PApplet {
                 .setPosition(15, 430)
                 .setSize(185, 40);
 
-        button = cp5.addButton("save")
+        button = cp5.addButton("pngsaver")
                 .setPosition(15, 480)
+                .setSize(185, 40);
+
+        button = cp5.addButton("xmlsaver")
+                .setPosition(15, 530)
                 .setSize(185, 40);
 
         AbstractMapProvider msft = new Microsoft.AerialProvider();
@@ -161,10 +166,6 @@ public class Program extends PApplet {
 
         MapUtils.createDefaultEventDispatcher(this, currentMap);
         thread("initMap");
-
-
-
-
     }
 
     public void draw() {
@@ -216,6 +217,7 @@ public class Program extends PApplet {
 
     }
 
+
     /**
      * The entry point of application.
      *
@@ -229,14 +231,13 @@ public class Program extends PApplet {
 
     /** Events handler */
 
-    public void save(){
-
+    /*
+    Save PNG
+     */
+    public void pngsaver() {
         JFrame parentFrame = new JFrame();
-
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Specify a file to save");
         int userSelection = fileChooser.showSaveDialog(parentFrame);
-
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             save(fileToSave.getAbsolutePath()+".png");
@@ -246,6 +247,8 @@ public class Program extends PApplet {
     /**
      * Update map.
      */
+
+    
     public void updateMap() {
         isSearching = true;
         currentMap.getDefaultMarkerManager().clearMarkers();
@@ -299,6 +302,27 @@ public class Program extends PApplet {
     /**
      * Init map.
      */
+
+    /*
+    Save XML
+     */
+    public void xmlsaver() throws IOException {
+
+        XStream xstream = new XStream();
+        JFrame parentFrame = new JFrame();
+        JFileChooser fileChooser = new JFileChooser();
+        int userSelection = fileChooser.showSaveDialog(parentFrame);
+        if (userSelection == JFileChooser.APPROVE_OPTION)
+        {
+            File fileToSave = fileChooser.getSelectedFile();
+            FileWriter fw = new FileWriter(fileToSave.getAbsoluteFile()+".xml");
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(xstream.toXML(localisations));
+            bw.close();
+        }
+
+    }
+
     public void initMap() {
         currentMap.setTweening(true);
         currentMap.setZoomRange(3, 15);
@@ -386,3 +410,4 @@ public class Program extends PApplet {
     }
 
 }
+
