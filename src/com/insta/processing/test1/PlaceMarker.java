@@ -41,7 +41,7 @@ public class PlaceMarker extends AbstractMarker {
         pg.image(img, x - img.width/2, y - img.height/2);
         if (isSelected())  {
 
-            engine.fill(255);
+            engine.fill(0);
             engine.stroke(0);
 
             float largeur = 160;
@@ -60,8 +60,9 @@ public class PlaceMarker extends AbstractMarker {
 
             engine.fill(0);
             try {
-                engine.text(text, 200+160, engine.displayHeight-largeur+50);
-                engine.text(author, 200+160,engine.displayHeight-largeur+5,engine.displayWidth-200-160-10,40 );
+                engine.fill(255);
+                engine.text(text, 200+180, engine.displayHeight-largeur+50);
+                engine.text(author, 200+180,engine.displayHeight-largeur+5,engine.displayWidth-200-160-10,40 );
 
             } catch (Exception e) {
                 System.out.println( e.getClass().getName()+" : " + e.getMessage()+"" +"\r\n\ttext : "+text+"\r\n\tauthor : "+author);
